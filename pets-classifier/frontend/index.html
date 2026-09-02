@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MascoteX — Clasificador Gato vs Perro</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="bg">
+    <div class="orb orb-a"></div>
+    <div class="orb orb-b"></div>
+    <div class="orb orb-c"></div>
+  </div>
+
+  <main class="app">
+    <header class="hero">
+      <span class="badge">Regresión Logística · HOG · 72.4% accuracy</span>
+      <h1>¿Es un <span class="grad-txt">perro</span> o un <span class="grad-txt">gato</span>?</h1>
+      <p class="sub">Arrastrá una foto, pegá desde el portapapeles (Ctrl+V) o tocá para elegir un archivo.</p>
+    </header>
+
+    <div class="card dropzone" id="dropzone" tabindex="0">
+      <div id="dz-empty" class="dz-inner">
+        <div class="dz-icon">🐾</div>
+        <p class="dz-title">Soltá la imagen acá</p>
+        <p class="dz-hint">o <strong>elegí un archivo</strong> · JPG / PNG</p>
+      </div>
+      <div id="dz-preview" class="dz-inner hidden">
+        <div class="preview-wrap">
+          <img id="preview-img" alt="Vista previa" />
+          <button id="btn-cambiar" class="btn-ghost" type="button">Cambiar imagen</button>
+        </div>
+      </div>
+      <input id="file-input" type="file" accept="image/*" hidden />
+    </div>
+
+    <section id="resultado" class="card resultado hidden">
+      <div class="r-top">
+        <div class="emoji-big" id="emoji">🐶</div>
+        <div class="r-info">
+          <h2 id="r-titulo">Perro</h2>
+          <p id="r-descripcion">El modelo tiene bastante confianza en esta decisión.</p>
+        </div>
+      </div>
+
+      <div class="baras">
+        <div class="b-fila">
+          <span class="b-label" id="lbl-gato">Gato</span>
+          <div class="pista">
+            <div class="relleno relleno-gato" id="relleno-gato"></div>
+          </div>
+          <span class="b-val" id="val-gato">0%</span>
+        </div>
+        <div class="b-fila">
+          <span class="b-label" id="lbl-perro">Perro</span>
+          <div class="pista">
+            <div class="relleno relleno-perro" id="relleno-perro"></div>
+          </div>
+          <span class="b-val" id="val-perro">0%</span>
+        </div>
+      </div>
+
+      <div class="r-metadata">
+        <span id="r-ms"></span>
+        <span id="r-resolucion"></span>
+        <span id="r-z" style="display:none"></span>
+      </div>
+    </section>
+
+    <section id="historia" class="historia hidden">
+      <h3>Recientes</h3>
+      <div id="lista-historia" class="lista-historia"></div>
+    </section>
+
+    <footer class="pie">
+      <p>Clasificador binario entrenado con el dataset <em>Dogs vs. Cats</em> (Microsoft/Kaggle).</p>
+    </footer>
+  </main>
+
+  <div id="confetti" aria-hidden="true"></div>
+  <script src="app.js"></script>
+</body>
+</html>
