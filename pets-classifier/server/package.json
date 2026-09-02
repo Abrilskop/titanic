@@ -1,0 +1,15 @@
+{
+  "name": "pets-classifier-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "API Express que clasifica gatos vs perros con regresion logistica sobre descriptores HOG",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "sharp": "^0.33.4"
+  }
+}
