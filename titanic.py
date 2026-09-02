@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
-    confusion_matrix, roc_curve, auc, classification_report
+    confusion_matrix, classification_report
 )
 from sklearn.preprocessing import StandardScaler
 import tkinter as tk
@@ -99,14 +99,12 @@ accuracy = accuracy_score(y_test, y_pred)
 precision = precision_score(y_test, y_pred)
 recall = recall_score(y_test, y_pred)
 f1 = f1_score(y_test, y_pred)
-auc_roc = auc(*roc_curve(y_test, y_prob)[:2])
 
 print(f"\n--- Metricas de Clasificacion Binaria ---")
 print(f"  Accuracy  : {accuracy:.4f}  ({accuracy*100:.2f}%)")
 print(f"  Precision : {precision:.4f}  ({precision*100:.2f}%)")
 print(f"  Recall    : {recall:.4f}  ({recall*100:.2f}%)")
 print(f"  F1-Score  : {f1:.4f}")
-print(f"  AUC-ROC   : {auc_roc:.4f}")
 
 print(f"\n--- Reporte de Clasificacion ---")
 print(classification_report(y_test, y_pred, target_names=["No Sobrevivio", "Sobrevivio"]))
@@ -154,27 +152,39 @@ ax2.set_title("Matriz de Confusion")
 ax2.set_xlabel("Prediccion")
 ax2.set_ylabel("Real")
 
-# --- Grafica 3: Curva ROC ---
+# --- Grafica 3: Importancia de features (coeficientes) ---
 ax3 = axes[1, 0]
-fpr, tpr, _ = roc_curve(y_test, y_prob)
-ax3.plot(fpr, tpr, color="darkorange", linewidth=2, label=f"AUC-ROC = {auc_roc:.4f}")
-ax3.plot([0, 1], [0, 1], color="gray", linestyle="--", linewidth=1, label="Random")
-ax3.set_title("Curva ROC")
-ax3.set_xlabel("Tasa de Falsos Positivos (FPR)")
-ax3.set_ylabel("Tasa de Verdaderos Positivos (TPR)")
-ax3.legend(loc="lower right")
-ax3.grid(True, alpha=0.3)
-
-# --- Grafica 4: Importancia de features (coeficientes) ---
-ax4 = axes[1, 1]
 feature_names = X.columns
 coefs = model.coef_[0]
 colors = ["green" if c > 0 else "red" for c in coefs]
-ax4.barh(feature_names, coefs, color=colors)
-ax4.set_title("Coeficientes del Modelo (importancia)")
-ax4.set_xlabel("Coeficiente")
-ax4.axvline(x=0, color="black", linewidth=0.8)
-ax4.grid(True, alpha=0.3, axis="x")
+ax3.barh(feature_names, coefs, color=colors)
+ax3.set_title("Coeficientes del Modelo (importancia)")
+ax3.set_xlabel("Coeficiente")
+ax3.axvline(x=0, color="black", linewidth=0.8)
+ax3.grid(True, alpha=0.3, axis="x")
+
+# --- Grafica 4: Prediccion de supervivencia (punto sobre la sigmoide) ---
+ax4 = axes[1, 1]
+ax4.plot(x_sig, y_sig, color="blue", linewidth=2)
+ax4.axhline(y=0.5, color="red", linestyle="--", linewidth=1, label="Limite = 0.5")
+# Ejemplo de varios pasajeros
+pasajeros = pd.DataFrame([
+    {"nombre": "Pasajero A (Hombre 3ra)", "row": {"pclass":3,"sex":0,"age":25,"sibsp":0,"parch":0,"fare":7,"embarked_Q":0,"embarked_S":1}},
+    {"nombre": "Pasajero B (Mujer 1ra)", "row": {"pclass":1,"sex":1,"age":29,"sibsp":1,"parch":0,"fare":100,"embarked_Q":0,"embarked_S":1}},
+    {"nombre": "Pasajero C (Mujer 3ra)", "row": {"pclass":3,"sex":1,"age":26,"sibsp":0,"parch":0,"fare":8,"embarked_Q":0,"embarked_S":1}},
+])
+for _, p in pasajeros.iterrows():
+    inp = pd.DataFrame([p["row"]])
+    prob = model.predict_proba(scaler.transform(inp))[0][1]
+    z = np.log(prob / (1 - prob)) if (0 < prob < 1) else (10 if prob == 1 else -10)
+    color = "green" if prob >= 0.5 else "red"
+    ax4.scatter(z, prob, color=color, s=60, zorder=5)
+    ax4.annotate(p["nombre"], (z, prob), textcoords="offset points", xytext=(5, 5), fontsize=8)
+ax4.set_title("Prediccion de supervivencia (puntos en la sigmoide)")
+ax4.set_xlabel("x (suma ponderada)")
+ax4.set_ylabel("y (probabilidad de sobrevivir)")
+ax4.legend()
+ax4.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.savefig("titanic_graficas.png", dpi=150, bbox_inches="tight")
