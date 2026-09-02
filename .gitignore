@@ -1,0 +1,16 @@
+# Datasets pesados (descargados de Microsoft/Kaggle)
+pets-classifier/data/
+
+# Dependencias de Node
+pets-classifier/server/node_modules/
+
+# Python
+__pycache__/
+*.pyc
+
+# Capturas de salida de consola
+err.txt
+out.txt
+
+# Archivos comprimidos
+*.zip
